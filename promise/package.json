@@ -1,0 +1,15 @@
+{
+  "name": "y-promise",
+  "version": "1.0.0",
+  "description": "",
+  "main": "y-promise.js",
+  "scripts": {
+    "test": "npm run test:aplus",
+    "test:aplus": "promises-aplus-tests adapter.js"
+  },
+  "author": "Yourtion <yourtion@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "promises-aplus-tests": "^2.1.2"
+  }
+}
