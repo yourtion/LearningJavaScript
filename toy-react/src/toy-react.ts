@@ -46,6 +46,7 @@ class TextWapper implements ToyComponent {
 export abstract class Component implements ToyComponent {
   props: Record<string, any> = Object.create(null)
   children: ToyComponent[] = []
+  protected state: Record<string, any> | null = null;
 
   private range: Range | null = null
 
@@ -63,10 +64,19 @@ export abstract class Component implements ToyComponent {
     this.range = range;
     this.render()[RENDER_TO_DOM](range)
   }
-  rerender() {
+  private rerender() {
     if (!this.range) return
     this.range.deleteContents()
     this[RENDER_TO_DOM](this.range)
+  }
+  setState(newState: Record<string, any>) {
+    if (this.state === null || typeof this.state !== "object") {
+      this.state = newState;
+      this.rerender();
+      return
+    }
+    merge(this.state, newState)
+    this.rerender();
   }
 }
 
@@ -97,4 +107,14 @@ export function render(component: ToyComponent, parentElement: HTMLElement) {
   range.setEnd(parentElement, parentElement.childNodes.length);
   range.deleteContents()
   component[RENDER_TO_DOM](range);
+}
+
+function merge(oldState: Record<string, any>, newState: Record<string, any>) {
+  for (let k in newState) {
+    if (oldState[k] === null || typeof oldState[k] !== "object") {
+      oldState[k] = newState[k]
+    } else {
+      merge(oldState[k], newState[k])
+    }
+  }
 }
