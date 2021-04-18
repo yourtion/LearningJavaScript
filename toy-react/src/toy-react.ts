@@ -11,8 +11,10 @@ class ElementWapper implements ToyComponent {
   }
   setAttribute(key: string, value: any) {
     if (key.match(/^on([\s\S]+)$/)) {
-      const event = RegExp.$1.replace(/^[/s/S]/, c => c.toLowerCase())
+      const event = RegExp.$1.replace(/^[\s\S]/, c => c.toLowerCase())
       this.root.addEventListener(event, value);
+    } else if (key === "className") {
+      this.root.setAttribute("class", value)
     } else {
       this.root.setAttribute(key, value)
     }
@@ -44,13 +46,14 @@ class TextWapper implements ToyComponent {
 }
 
 export abstract class Component implements ToyComponent {
-  props: Record<string, any> = Object.create(null)
+  props: Record<string, any>
   children: ToyComponent[] = []
-  protected state: Record<string, any> | null = null;
+  protected state: Record<string, any> = Object.create(null);
 
   private range: Range | null = null
 
-  constructor() {
+  constructor(props: Record<string, any> = Object.create(null)) {
+    this.props = props
   }
   abstract render(): Component;
 
@@ -64,19 +67,29 @@ export abstract class Component implements ToyComponent {
     this.range = range;
     this.render()[RENDER_TO_DOM](range)
   }
-  private rerender() {
+  private reRender() {
     if (!this.range) return
-    this.range.deleteContents()
-    this[RENDER_TO_DOM](this.range)
+    // 保留老 range
+    const oldRange = this.range;
+    // 创建一个新 range 设置成老 range 的 start
+    const range = document.createRange();
+    range.setStart(oldRange.startContainer, oldRange.startOffset)
+    range.setEnd(oldRange.startContainer, oldRange.startOffset)
+    // 执行渲染，在前面插入渲染的内容
+    this[RENDER_TO_DOM](range)
+    // 把老 range 的起点放到渲染后的 range 结尾，并删除之后的内容
+    oldRange.setStart(range.endContainer, range.endOffset);
+    oldRange.deleteContents()
   }
   setState(newState: Record<string, any>) {
+    console.log(newState);
     if (this.state === null || typeof this.state !== "object") {
       this.state = newState;
-      this.rerender();
+      this.reRender();
       return
     }
     merge(this.state, newState)
-    this.rerender();
+    this.reRender();
   }
 }
 
@@ -87,6 +100,9 @@ export function createElement(type: any, attributes: Record<string, any>, ...chi
   }
   let appendChildren = (children: any[]) => {
     for (let child of children) {
+      if (child === null) {
+        continue;
+      }
       if (typeof child === 'string') {
         child = new TextWapper(child);
       }

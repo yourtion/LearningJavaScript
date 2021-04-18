@@ -1,41 +1,69 @@
 import { createElement, render, Component } from './toy-react';
 
-class MyComponent extends Component {
-  state: Record<string, any>;
-  constructor() {
-    super();
+class Square extends Component {
+  constructor(props: Record<string, any>) {
+    super(props);
     this.state = {
-      a: 1,
-      b: 2,
+      value: null,
     };
   }
+
   render() {
     return (
+      <button className="square" onClick={() => this.setState({ value: 'X' })}>
+        {this.state!.value}
+      </button>
+    );
+  }
+}
+
+class Board extends Component {
+  renderSquare(i: number) {
+    return <Square />;
+  }
+
+  render() {
+    const status = 'Next player: X';
+
+    return (
       <div>
-        <h1>my component</h1>
-        <span>
-          {this.state.a.toString()} --- {this.state.b.toString()}
-        </span>
-        <br />
-        <button
-          onclick={() => {
-            this.setState({ a: this.state.a + 1 });
-          }}
-        >
-          Add
-        </button>
-        {/* {this.children} */}
+        <div className="status">{status}</div>
+        <div className="board-row">
+          {this.renderSquare(0)}
+          {this.renderSquare(1)}
+          {this.renderSquare(2)}
+        </div>
+        <div className="board-row">
+          {this.renderSquare(3)}
+          {this.renderSquare(4)}
+          {this.renderSquare(5)}
+        </div>
+        <div className="board-row">
+          {this.renderSquare(6)}
+          {this.renderSquare(7)}
+          {this.renderSquare(8)}
+        </div>
       </div>
     );
   }
 }
 
-const a = (
-  <MyComponent id="a" class="div1">
-    <div>aaa</div>
-    <div></div>
-  </MyComponent>
-);
-console.log(a);
+class Game extends Component {
+  render() {
+    return (
+      <div className="game">
+        <div className="game-board">
+          <Board />
+        </div>
+        <div className="game-info">
+          <div>{/* status */}</div>
+          <ol>{/* TODO */}</ol>
+        </div>
+      </div>
+    );
+  }
+}
 
-render(a, document.getElementById('app')!);
+// ========================================
+
+render(<Game />, document.getElementById('root')!);
