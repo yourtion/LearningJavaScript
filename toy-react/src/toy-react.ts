@@ -10,7 +10,12 @@ class ElementWapper implements ToyComponent {
     this.root = document.createElement(tag)
   }
   setAttribute(key: string, value: any) {
-    this.root.setAttribute(key, value)
+    if (key.match(/^on([\s\S]+)$/)) {
+      const event = RegExp.$1.replace(/^[/s/S]/, c => c.toLowerCase())
+      this.root.addEventListener(event, value);
+    } else {
+      this.root.setAttribute(key, value)
+    }
   }
   appendChild(component: ToyComponent) {
     const range = document.createRange()
@@ -41,6 +46,9 @@ class TextWapper implements ToyComponent {
 export abstract class Component implements ToyComponent {
   props: Record<string, any> = Object.create(null)
   children: ToyComponent[] = []
+
+  private range: Range | null = null
+
   constructor() {
   }
   abstract render(): Component;
@@ -52,7 +60,13 @@ export abstract class Component implements ToyComponent {
     this.children.push(component)
   }
   [RENDER_TO_DOM](range: Range) {
+    this.range = range;
     this.render()[RENDER_TO_DOM](range)
+  }
+  rerender() {
+    if (!this.range) return
+    this.range.deleteContents()
+    this[RENDER_TO_DOM](this.range)
   }
 }
 

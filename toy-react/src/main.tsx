@@ -14,7 +14,16 @@ class MyComponent extends Component {
       <div>
         <h1>my component</h1>
         <span>{this.state.a.toString()}</span>
-        {this.children}
+        <br />
+        <button
+          onclick={() => {
+            this.state.a++;
+            this.rerender();
+          }}
+        >
+          Add
+        </button>
+        {/* {this.children} */}
       </div>
     );
   }
