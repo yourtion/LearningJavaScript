@@ -1,69 +1,138 @@
 const RENDER_TO_DOM = Symbol("render_to_dom")
-
-export abstract class Component {
-  props: Record<string, any>
-  children: Component[] = []
+const TYPE_TEXT = "#text" as const
+/** 虚拟 DOM */
+interface VDOM {
+  /** 类型 */
+  readonly type: string
+  /** 属性 */
+  readonly props: Record<string, any>
+  [key: string]: any
+}
+/** 组件 */
+export abstract class Component implements VDOM {
+  type: string;
+  props: Record<string, any>;
+  /** 上次渲染的 VDom 缓存 */
+  private oldDVdom: Component | null = null;
+  /** 上次渲染的 range 缓存 */
+  protected range: Range | null = null;
+  /** 子节点 */
+  protected children: Component[] = []
+  /** vdom 类型子节点 */
+  protected vchildren: Component[] | null = null
+  /** 状态 */
   protected state: Record<string, any> = Object.create(null);
 
-  private range: Range | null = null
-
-  constructor(props: Record<string, any> = Object.create(null)) {
-    this.props = props
-  }
+  /** 渲染函数 */
   abstract render(): Component;
 
-  setAttribute(key: string, value: any) {
-    this.props[key] = value
+  constructor(props: Record<string, any> = Object.create(null)) {
+    this.type = this.constructor.name;
+    this.props = props
   }
+  /** 设置属性 */
+  setAttribute(name: string, value: any) {
+    this.props[name] = value
+  }
+  /** 添加子节点 */
   appendChild(component: Component) {
     this.children.push(component)
   }
-  get vdom(): Component {
-    return this.render()
+  /** 获取 VDom */
+  protected get vdom(): Component {
+    return this.render().vdom
   }
-  get vchildren(): Component[] {
-    return this.children.map(c => c.vdom)
-  }
-  [RENDER_TO_DOM](range: Range) {
+
+  /** 渲染函数实现 */
+  protected [RENDER_TO_DOM](range: Range) {
     this.range = range;
-    this.render()[RENDER_TO_DOM](range)
+    this.oldDVdom = this.vdom;
+    // 递归调用，直到原始类型
+    this.oldDVdom[RENDER_TO_DOM](range)
   }
-  private reRender() {
-    if (!this.range) return
-    // 保留老 range
-    const oldRange = this.range;
-    // 创建一个新 range 设置成老 range 的 start
-    const range = document.createRange();
-    range.setStart(oldRange.startContainer, oldRange.startOffset)
-    range.setEnd(oldRange.startContainer, oldRange.startOffset)
-    // 执行渲染，在前面插入渲染的内容
-    this[RENDER_TO_DOM](range)
-    // 把老 range 的起点放到渲染后的 range 结尾，并删除之后的内容
-    oldRange.setStart(range.endContainer, range.endOffset);
-    oldRange.deleteContents()
+
+  /** 更新内容 */
+  private update() {
+    /** 判断两个根节点是否一致 */
+    function isSameNode(oldDVdom: VDOM, newVDom: VDOM) {
+      if (oldDVdom.type !== newVDom.type) return false;
+      // 比对各个属性
+      for (const name in newVDom.props) {
+        if (newVDom.props[name] !== oldDVdom.props[name]) return false;
+      }
+      // 如果旧属性长度大于新属性，也认为不同
+      if (Object.keys(oldDVdom.props).length > Object.keys(newVDom.props).length) {
+        return false;
+      }
+      // 对于文本类型节点，还需要比较内容
+      if (newVDom.type === TYPE_TEXT) {
+        if (newVDom.content !== oldDVdom.content) return false;
+      }
+      return true;
+    }
+    /** 更新节点实际执行函数 */
+    function updateNode(oldDVdom: Component, newVDom: Component) {
+      // type props children
+      // #text content
+      if (!isSameNode(oldDVdom, newVDom)) {
+        return newVDom[RENDER_TO_DOM](oldDVdom.range!)
+      }
+      // 注意：只有 ElementWapper 和 TextWapper 可以
+      newVDom.range = oldDVdom.range
+      // 处理子节点
+      const oldChildren = oldDVdom.vchildren
+      const newChildren = newVDom.vchildren
+      if (!oldChildren || !oldChildren.length) return;
+      if (!newChildren || !newChildren.length) return;
+
+      // 获取旧数据最后的位置
+      let tailRange = oldChildren[oldChildren.length - 1].range;
+      for (let i = 0; i < newChildren.length; i++) {
+        const newChild = newChildren[i];
+        const oldChild = oldChildren[i];
+        if (i < oldChildren.length) {
+          updateNode(oldChild, newChild)
+        } else {
+          // 插入新增的节点
+          if (!tailRange) return;
+          const range = document.createRange();
+          range.setStart(tailRange.endContainer, tailRange.endOffset);
+          range.setEnd(tailRange.endContainer, tailRange.endOffset);
+          newChild[RENDER_TO_DOM](range)
+          tailRange = range;
+        }
+      }
+    }
+
+    const vdom = this.vdom;
+    updateNode(this.oldDVdom!, vdom)
+    this.oldDVdom = vdom;
   }
+  /** 设置新的状态 */
   setState(newState: Record<string, any>) {
-    console.log(newState);
     if (this.state === null || typeof this.state !== "object") {
       this.state = newState;
-      this.reRender();
-      return
+      this.update();
+      return;
     }
     merge(this.state, newState)
-    this.reRender();
+    this.update();
   }
 }
+
+/** 普通元素 */
 class ElementWapper extends Component {
-  type: string
   constructor(tag: string) {
     super()
     this.type = tag;
   }
-  get vdom() {
+  protected get vdom() {
+    this.vchildren = this.children.map(c => c.vdom)
     return this
   }
-  [RENDER_TO_DOM](range: Range) {
-    range.deleteContents()
+  protected [RENDER_TO_DOM](range: Range) {
+    this.range = range;
+
     const root = document.createElement(this.type)
     for (const name in this.props) {
       const value = this.props[name];
@@ -76,7 +145,10 @@ class ElementWapper extends Component {
         root.setAttribute(name, value)
       }
     }
-    for (const child of this.children) {
+    if (!this.vchildren) {
+      this.vchildren = this.children.map(c => c.vdom)
+    }
+    for (const child of this.vchildren) {
       const childRange = document.createRange()
       // 因为是 appendChild 所以一定是放在最后
       childRange.setStart(root, root.childNodes.length)
@@ -84,35 +156,36 @@ class ElementWapper extends Component {
       childRange.deleteContents()
       child[RENDER_TO_DOM](childRange);
     }
-    range.insertNode(root)
+    replaceContent(range, root)
   }
-  render() {
-    return this
-  }
+  render() { return this }
 }
 
 class TextWapper extends Component {
-  type: string
-  content: string
+  protected content: string
 
   constructor(content: string) {
     super()
     this.content = content
-    this.type = "#text";
+    this.type = TYPE_TEXT;
   }
-  get vdom() {
+  protected get vdom() {
     return this
   }
-  [RENDER_TO_DOM](range: Range) {
-    range.deleteContents()
+  protected [RENDER_TO_DOM](range: Range) {
+    this.range = range;
     const root = document.createTextNode(this.content)
-    range.insertNode(root)
+    replaceContent(range, root)
   }
-  render() {
-    return this
-  }
+  render() { return this }
 }
 
+/**
+ * 创建元素
+ * @param type 类型
+ * @param attributes 属性
+ * @param children 子节点数组
+ */
 export function createElement(type: any, attributes: Record<string, any>, ...children: any[]) {
   const e = typeof type === "string" ? new ElementWapper(type) : new type
   for (const p in attributes) {
@@ -127,6 +200,7 @@ export function createElement(type: any, attributes: Record<string, any>, ...chi
         child = new TextWapper(child);
       }
       if (Array.isArray(child)) {
+        // 对数组递归调用
         appendChildren(child)
       } else {
         e.appendChild(child);
@@ -137,6 +211,11 @@ export function createElement(type: any, attributes: Record<string, any>, ...chi
   return e;
 }
 
+/**
+ * 渲染到真实 Dom 上
+ * @param component 
+ * @param parentElement 
+ */
 export function render(component: Component, parentElement: HTMLElement) {
   const range = document.createRange()
   range.setStart(parentElement, 0)
@@ -145,12 +224,24 @@ export function render(component: Component, parentElement: HTMLElement) {
   component[RENDER_TO_DOM](range);
 }
 
+/** 合并两个对象 */
 function merge(oldState: Record<string, any>, newState: Record<string, any>) {
   for (let k in newState) {
     if (oldState[k] === null || typeof oldState[k] !== "object") {
+      // 处理非对象
       oldState[k] = newState[k]
     } else {
       merge(oldState[k], newState[k])
     }
   }
+}
+
+/** 执行内容替换 */
+function replaceContent(range: Range, node: Node) {
+  range.insertNode(node);
+  range.setStartAfter(node);
+  range.deleteContents();
+  // 重新设置 range
+  range.setStartBefore(node);
+  range.setEndAfter(node);
 }
