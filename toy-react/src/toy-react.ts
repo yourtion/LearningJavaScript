@@ -1,53 +1,8 @@
 const RENDER_TO_DOM = Symbol("render_to_dom")
 
-interface ToyComponent {
-  [RENDER_TO_DOM]: (range: Range) => void
-}
-
-class ElementWapper implements ToyComponent {
-  private root: HTMLElement
-  constructor(tag: string) {
-    this.root = document.createElement(tag)
-  }
-  setAttribute(key: string, value: any) {
-    if (key.match(/^on([\s\S]+)$/)) {
-      const event = RegExp.$1.replace(/^[\s\S]/, c => c.toLowerCase())
-      this.root.addEventListener(event, value);
-    } else if (key === "className") {
-      this.root.setAttribute("class", value)
-    } else {
-      this.root.setAttribute(key, value)
-    }
-  }
-  appendChild(component: ToyComponent) {
-    const range = document.createRange()
-    // 因为是 appendChild 所以一定是放在最后
-    range.setStart(this.root, this.root.childNodes.length)
-    range.setEnd(this.root, this.root.childNodes.length);
-    range.deleteContents()
-    component[RENDER_TO_DOM](range);
-  }
-  [RENDER_TO_DOM](range: Range) {
-    range.deleteContents()
-    range.insertNode(this.root)
-  }
-}
-
-class TextWapper implements ToyComponent {
-  private root: Text
-
-  constructor(content: string) {
-    this.root = document.createTextNode(content)
-  }
-  [RENDER_TO_DOM](range: Range) {
-    range.deleteContents()
-    range.insertNode(this.root)
-  }
-}
-
-export abstract class Component implements ToyComponent {
+export abstract class Component {
   props: Record<string, any>
-  children: ToyComponent[] = []
+  children: Component[] = []
   protected state: Record<string, any> = Object.create(null);
 
   private range: Range | null = null
@@ -60,8 +15,14 @@ export abstract class Component implements ToyComponent {
   setAttribute(key: string, value: any) {
     this.props[key] = value
   }
-  appendChild(component: ToyComponent) {
+  appendChild(component: Component) {
     this.children.push(component)
+  }
+  get vdom(): Component {
+    return this.render()
+  }
+  get vchildren(): Component[] {
+    return this.children.map(c => c.vdom)
   }
   [RENDER_TO_DOM](range: Range) {
     this.range = range;
@@ -92,6 +53,65 @@ export abstract class Component implements ToyComponent {
     this.reRender();
   }
 }
+class ElementWapper extends Component {
+  type: string
+  constructor(tag: string) {
+    super()
+    this.type = tag;
+  }
+  get vdom() {
+    return this
+  }
+  [RENDER_TO_DOM](range: Range) {
+    range.deleteContents()
+    const root = document.createElement(this.type)
+    for (const name in this.props) {
+      const value = this.props[name];
+      if (name.match(/^on([\s\S]+)$/)) {
+        const event = RegExp.$1.replace(/^[\s\S]/, c => c.toLowerCase())
+        root.addEventListener(event, value);
+      } else if (name === "className") {
+        root.setAttribute("class", value)
+      } else {
+        root.setAttribute(name, value)
+      }
+    }
+    for (const child of this.children) {
+      const childRange = document.createRange()
+      // 因为是 appendChild 所以一定是放在最后
+      childRange.setStart(root, root.childNodes.length)
+      childRange.setEnd(root, root.childNodes.length);
+      childRange.deleteContents()
+      child[RENDER_TO_DOM](childRange);
+    }
+    range.insertNode(root)
+  }
+  render() {
+    return this
+  }
+}
+
+class TextWapper extends Component {
+  type: string
+  content: string
+
+  constructor(content: string) {
+    super()
+    this.content = content
+    this.type = "#text";
+  }
+  get vdom() {
+    return this
+  }
+  [RENDER_TO_DOM](range: Range) {
+    range.deleteContents()
+    const root = document.createTextNode(this.content)
+    range.insertNode(root)
+  }
+  render() {
+    return this
+  }
+}
 
 export function createElement(type: any, attributes: Record<string, any>, ...children: any[]) {
   const e = typeof type === "string" ? new ElementWapper(type) : new type
@@ -117,7 +137,7 @@ export function createElement(type: any, attributes: Record<string, any>, ...chi
   return e;
 }
 
-export function render(component: ToyComponent, parentElement: HTMLElement) {
+export function render(component: Component, parentElement: HTMLElement) {
   const range = document.createRange()
   range.setStart(parentElement, 0)
   range.setEnd(parentElement, parentElement.childNodes.length);
