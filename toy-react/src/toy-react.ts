@@ -39,7 +39,7 @@ export abstract class Component implements VDOM {
     this.children.push(component)
   }
   /** 获取 VDom */
-  protected get vdom(): Component {
+  get vdom(): Component {
     return this.render().vdom
   }
 
@@ -126,7 +126,7 @@ class ElementWapper extends Component {
     super()
     this.type = tag;
   }
-  protected get vdom() {
+  get vdom() {
     this.vchildren = this.children.map(c => c.vdom)
     return this
   }
@@ -169,7 +169,7 @@ class TextWapper extends Component {
     this.content = content
     this.type = TYPE_TEXT;
   }
-  protected get vdom() {
+  get vdom() {
     return this
   }
   protected [RENDER_TO_DOM](range: Range) {

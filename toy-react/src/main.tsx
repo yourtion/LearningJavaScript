@@ -1,4 +1,4 @@
-import { createElement, render, Component } from './toy-react';
+import { render, Component } from './toy-react';
 
 class Square extends Component {
   constructor(props: Record<string, any>) {
