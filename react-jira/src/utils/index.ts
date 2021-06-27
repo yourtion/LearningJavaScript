@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 /**
  * 判断除了 0 外的空值
  */
-export function isFalsy(val) {
+export function isFalsy(val: unknown) {
   return val === 0 ? false : !val;
 }
 
 /**
  * 清理对象中的空值
  */
-export function cleanObject(obj) {
+export function cleanObject(obj: Record<string, any>) {
   const result = { ...obj };
   Object.keys(obj).forEach((k) => {
     if (isFalsy(obj[k])) {
@@ -23,7 +23,7 @@ export function cleanObject(obj) {
 /**
  * 只在 mount 时执行一次
  */
-export function useMount(callback) {
+export function useMount(callback: () => void) {
   useEffect(() => {
     callback();
   }, [callback]);
@@ -32,7 +32,7 @@ export function useMount(callback) {
 /**
  * debonce 一个
  */
-export function useDebounce(value, delay) {
+export function useDebounce<V>(value: V, delay?: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {

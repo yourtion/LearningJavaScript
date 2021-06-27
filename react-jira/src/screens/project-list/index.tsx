@@ -10,12 +10,9 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 export const ProjectListScreen = () => {
   const [users, setUsers] = useState([]);
-  const [param, setParam] = useState({
-    name: '',
-    personId: '',
-  });
+  const [param, setParam] = useState({ name: '', personId: '' });
   const [list, setList] = useState([]);
-  const debouncedParam = useDebounce(param, 2000);
+  const debouncedParam = useDebounce(param, 500);
 
   useEffect(() => {
     fetch(`${apiUrl}/projects?${qs.stringify(cleanObject(debouncedParam))}`).then(async (response) => {

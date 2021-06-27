@@ -1991,6 +1991,11 @@
   resolved "https://registry.nlark.com/@types/q/download/@types/q-1.5.4.tgz?cache=0&sync_timestamp=1621242400776&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40types%2Fq%2Fdownload%2F%40types%2Fq-1.5.4.tgz#15925414e0ad2cd765bfef58842f7e26a7accb24"
   integrity sha1-FZJUFOCtLNdlv+9YhC9+JqesyyQ=
 
+"@types/qs@^6.9.6":
+  version "6.9.6"
+  resolved "https://registry.nlark.com/@types/qs/download/@types/qs-6.9.6.tgz?cache=0&sync_timestamp=1621242292262&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40types%2Fqs%2Fdownload%2F%40types%2Fqs-6.9.6.tgz#df9c3c8b31a247ec315e6996566be3171df4b3b1"
+  integrity sha1-35w8izGiR+wxXmmWVmvjFx30s7E=
+
 "@types/react-dom@^17.0.0":
   version "17.0.8"
   resolved "https://registry.nlark.com/@types/react-dom/download/@types/react-dom-17.0.8.tgz#3180de6d79bf53762001ad854e3ce49f36dd71fc"
