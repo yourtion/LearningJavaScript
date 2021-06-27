@@ -21,7 +21,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "prepare": "cd ../ && husky install ./react-jira/.husky"
+    "prepare": "cd ../ && husky install ./react-jira/.husky",
+    "format": "prettier --write ."
   },
   "eslintConfig": {
     "extends": [
@@ -43,14 +44,17 @@
     ]
   },
   "devDependencies": {
+    "@commitlint/cli": "^12.1.4",
+    "@commitlint/config-conventional": "^12.1.4",
     "eslint-config-prettier": "^8.3.0",
     "husky": ">=6",
     "lint-staged": ">=10",
     "prettier": "2.3.2"
   },
-  "husky":{
+  "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
   "lint-staged": {
