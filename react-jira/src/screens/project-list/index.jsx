@@ -1,5 +1,4 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import qs from 'qs';
 
@@ -26,13 +25,15 @@ export const ProjectListScreen = () => {
     });
   }, [debouncedParam]);
 
-  useMount(() => {
-    fetch(`${apiUrl}/users`).then(async (response) => {
-      if (response.ok) {
-        setUsers(await response.json());
-      }
-    });
-  });
+  useMount(
+    useCallback(() => {
+      fetch(`${apiUrl}/users`).then(async (response) => {
+        if (response.ok) {
+          setUsers(await response.json());
+        }
+      });
+    }, [])
+  );
 
   return (
     <div>

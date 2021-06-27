@@ -26,11 +26,11 @@ export function cleanObject(obj) {
 export function useMount(callback) {
   useEffect(() => {
     callback();
-  }, []);
+  }, [callback]);
 }
 
 /**
- * debonce 一个变量
+ * debonce 一个
  */
 export function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
