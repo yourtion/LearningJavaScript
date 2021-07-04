@@ -3,17 +3,17 @@ import { useEffect, useState } from 'react';
 /**
  * 判断除了 0 外的空值
  */
-export function isFalsy(val: unknown) {
-  return val === 0 ? false : !val;
+export function isVoid(val: unknown) {
+  return val === undefined || val === null || val === '';
 }
 
 /**
  * 清理对象中的空值
  */
-export function cleanObject(obj: Record<string, any>) {
+export function cleanObject(obj: Record<string, unknown>) {
   const result = { ...obj };
   Object.keys(obj).forEach((k) => {
-    if (isFalsy(obj[k])) {
+    if (isVoid(obj[k])) {
       delete result[k];
     }
   });
