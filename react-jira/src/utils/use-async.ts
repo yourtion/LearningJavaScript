@@ -7,8 +7,10 @@ interface State<D> {
 }
 
 const defaultInintialState: State<null> = { stat: 'idle', data: null, error: null };
+const defaultConfig = { throwOnError: false };
 
-export function useAsync<D>(initialState?: State<D>) {
+export function useAsync<D>(initialState?: State<D>, initialConfig?: typeof defaultConfig) {
+  const config = { ...defaultConfig, ...initialConfig };
   const [state, setState] = useState<State<D>>({
     ...defaultInintialState,
     ...initialState,
@@ -27,7 +29,7 @@ export function useAsync<D>(initialState?: State<D>) {
       })
       .catch((err) => {
         setError(err);
-        return err;
+        return config.throwOnError ? Promise.reject(err) : err;
       });
   };
   return {
