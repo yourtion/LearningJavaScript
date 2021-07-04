@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { Form, Input, Select } from 'antd';
 export interface User {
-  id: number;
+  id: string;
   name: string;
   token: string;
 }
