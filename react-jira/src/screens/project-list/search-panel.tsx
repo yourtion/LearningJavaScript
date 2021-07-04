@@ -1,3 +1,4 @@
+import { Form, Input, Select } from 'antd';
 export interface User {
   id: number;
   name: string;
@@ -15,18 +16,18 @@ interface SearchPanelProp {
 
 export const SearchPanel = ({ users, param, setParam }: SearchPanelProp) => {
   return (
-    <form>
-      <div>
-        <input type="text" value={param.name} onChange={(evt) => setParam({ ...param, name: evt.target.value })} />
-        <select value={param.personId} onChange={(evt) => setParam({ ...param, personId: evt.target.value })}>
-          <option value={''}>负责人</option>
+    <Form>
+      <Form.Item>
+        <Input type="text" value={param.name} onChange={(evt) => setParam({ ...param, name: evt.target.value })} />
+        <Select value={param.personId} onChange={(val) => setParam({ ...param, personId: val })}>
+          <Select.Option value={''}>负责人</Select.Option>
           {users.map((user) => (
-            <option value={user.id} key={user.id}>
+            <Select.Option value={user.id} key={user.id}>
               {user.name}
-            </option>
+            </Select.Option>
           ))}
-        </select>
-      </div>
-    </form>
+        </Select>
+      </Form.Item>
+    </Form>
   );
 };
