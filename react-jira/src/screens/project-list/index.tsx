@@ -7,11 +7,11 @@ import styled from '@emotion/styled';
 import { useProjects } from 'utils/project';
 import { useUsers } from 'utils/user';
 import { useUrlQueryParam } from 'utils/url';
+import { useProjectSearchParams } from './util';
 
 export const ProjectListScreen = () => {
-  const [param, setParam] = useUrlQueryParam(['name', 'personId']);
-  const debouncedParam = useDebounce(param, 500);
-  const { isLoaing, error, data: list } = useProjects(debouncedParam);
+  const [param, setParam] = useProjectSearchParams();
+  const { isLoaing, error, data: list } = useProjects(useDebounce(param, 500));
   const { data: users } = useUsers();
 
   useDocumentTitle('项目列表');

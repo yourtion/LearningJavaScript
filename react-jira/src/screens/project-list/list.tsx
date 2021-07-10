@@ -2,12 +2,10 @@ import { User } from './search-panel';
 import { Table, TableProps } from 'antd';
 import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
-
-// TODO: ID 更新为 number 类型
 export interface Project {
-  id: string;
+  id: number;
   name: string;
-  personId: string;
+  personId: number;
   organization: string;
   created: number;
 }
