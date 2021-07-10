@@ -58,3 +58,7 @@ export function useDocumentTitle(title: string, keepOnUnmount = false) {
     };
   }, [keepOnUnmount, oldTitle]);
 }
+
+export function resetRoute() {
+  window.location.href = window.location.origin;
+}

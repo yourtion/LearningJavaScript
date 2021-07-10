@@ -3,9 +3,30 @@ import { Button, Dropdown, Menu } from 'antd';
 import { Row } from 'components/lib';
 import { useAuth } from 'context/auth-context';
 import { ProjectListScreen } from './screens/project-list';
+import { ProjectScreen } from './screens/project';
 import { ReactComponent as SoftwareLogo } from 'assets/software-logo.svg';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router';
+import { resetRoute } from 'utils';
 
 export function AuthedApp() {
+  return (
+    <Container>
+      <PageHeader />
+      <Main>
+        <Router>
+          <Routes>
+            <Route path={'/projects'} element={<ProjectListScreen />} />
+            <Route path={'/projects/:projectId/*'} element={<ProjectScreen />} />
+            <Navigate to={window.location.pathname + '/projects'} />
+          </Routes>
+        </Router>
+      </Main>
+    </Container>
+  );
+}
+
+const PageHeader = () => {
   const { logout, user } = useAuth();
   const DropdownMenu = (
     <Menu>
@@ -17,25 +38,22 @@ export function AuthedApp() {
     </Menu>
   );
   return (
-    <Container>
-      <Header between={true}>
-        <HeaderLeft gap={true}>
+    <Header between={true}>
+      <HeaderLeft gap={true}>
+        <Button type={'link'} onClick={resetRoute}>
           <SoftwareLogo width={'18rem'} color={'rgb(38, 132, 255)'} />
-          <h2>项目</h2>
-          <h2>用户</h2>
-        </HeaderLeft>
-        <HeaderRight>
-          <Dropdown overlay={DropdownMenu}>
-            <Button type={'link'}>Hi, {user?.name}</Button>
-          </Dropdown>
-        </HeaderRight>
-      </Header>
-      <Main>
-        <ProjectListScreen />
-      </Main>
-    </Container>
+        </Button>
+        <h2>项目</h2>
+        <h2>用户</h2>
+      </HeaderLeft>
+      <HeaderRight>
+        <Dropdown overlay={DropdownMenu}>
+          <Button type={'link'}>Hi, {user?.name}</Button>
+        </Dropdown>
+      </HeaderRight>
+    </Header>
   );
-}
+};
 
 const Container = styled.div`
   display: grid;

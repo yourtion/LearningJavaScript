@@ -1,6 +1,9 @@
 import { User } from './search-panel';
 import { Table, TableProps } from 'antd';
 import dayjs from 'dayjs';
+import { Link } from 'react-router-dom';
+
+// TODO: ID 更新为 number 类型
 export interface Project {
   id: string;
   name: string;
@@ -21,7 +24,9 @@ export const List = ({ users, ...props }: ListProps) => {
       columns={[
         {
           title: '名称',
-          dataIndex: 'name',
+          render(value, project) {
+            return <Link to={String(project.id)}>{project.name}</Link>;
+          },
           sorter: (a, b) => a.name.localeCompare(b.name),
         },
         {
