@@ -59,6 +59,7 @@
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
     "@types/qs": "^6.9.6",
+    "@welldone-software/why-did-you-render": "^6.2.0",
     "eslint-config-prettier": "^8.3.0",
     "husky": ">=6",
     "lint-staged": ">=10",
