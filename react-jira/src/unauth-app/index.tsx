@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 import logo from 'assets/logo.svg';
 import left from 'assets/left.svg';
 import right from 'assets/right.svg';
+import { useDocumentTitle } from 'utils';
 
 export function UnauthApp() {
   const [isRegister, setIsRegister] = useState(false);
@@ -14,6 +15,7 @@ export function UnauthApp() {
     setError(null);
     setIsRegister(!isRegister);
   };
+  useDocumentTitle('请登录或注册以继续');
   return (
     <Container>
       <Header />

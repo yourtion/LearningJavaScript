@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * 判断除了 0 外的空值
@@ -43,4 +43,18 @@ export function useDebounce<V>(value: V, delay?: number) {
   }, [value, delay]);
 
   return debouncedValue;
+}
+
+export function useDocumentTitle(title: string, keepOnUnmount = false) {
+  const oldTitle = useRef(document.title).current;
+  useEffect(() => {
+    document.title = title;
+  });
+  useEffect(() => {
+    return () => {
+      if (!keepOnUnmount) {
+        document.title = oldTitle;
+      }
+    };
+  }, [keepOnUnmount, oldTitle]);
 }
