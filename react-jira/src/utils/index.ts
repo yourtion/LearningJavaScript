@@ -45,6 +45,9 @@ export function useDebounce<V>(value: V, delay?: number) {
   return debouncedValue;
 }
 
+/**
+ * 设置页面标题
+ */
 export function useDocumentTitle(title: string, keepOnUnmount = false) {
   const oldTitle = useRef(document.title).current;
   useEffect(() => {
@@ -59,6 +62,23 @@ export function useDocumentTitle(title: string, keepOnUnmount = false) {
   }, [keepOnUnmount, oldTitle]);
 }
 
+/**
+ * 重设路由
+ */
 export function resetRoute() {
   window.location.href = window.location.origin;
+}
+
+/**
+ * 返回组件的挂载状态，如果还没挂载或已经卸载，返回 false 否则返回 true
+ */
+export function useMountedRef() {
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  });
+  return mountedRef;
 }

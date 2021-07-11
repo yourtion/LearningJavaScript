@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useMount(
     useCallback(() => {
       run(bootstrapUser());
-    }, [])
+    }, [run])
   );
 
   if (isIdle || isLoaing) {

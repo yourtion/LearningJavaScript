@@ -11,7 +11,7 @@ export function useUsers(param?: Partial<User>) {
   useMount(
     useCallback(() => {
       run(client('users'));
-    }, [])
+    }, [run, client])
   );
 
   return result;
