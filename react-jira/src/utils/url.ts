@@ -7,9 +7,9 @@ export function useUrlQueryParam<K extends string>(keys: K[]) {
   const params = keys.reduce((prev, key) => {
     return { ...prev, [key]: searchParams.get(key) || '' };
   }, {} as Record<K, string>);
-  // 不关心 keys 是否变化，所以不加入依赖检查
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return [
+    // 不关心 keys 是否变化，所以不加入依赖检查
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useMemo(() => params, [searchParams]),
     (params: Partial<{ [key in K]: unknown }>) => {
       const o = cleanObject({ ...Object.fromEntries(searchParams), ...params });

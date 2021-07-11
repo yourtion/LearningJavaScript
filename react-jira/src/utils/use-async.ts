@@ -15,11 +15,15 @@ export function useAsync<D>(initialState?: State<D>, initialConfig?: typeof defa
     ...defaultInintialState,
     ...initialState,
   });
+  const [retry, setRetry] = useState(() => () => {});
   const setData = (data: D) => setState({ data, stat: 'success', error: null });
   const setError = (error: Error) => setState({ error, stat: 'error', data: null });
-  const run = (promise: Promise<D>) => {
+  const run = (promise: Promise<D>, runConfig?: { retry: () => Promise<D> }) => {
     if (!promise || !promise.then) {
       throw new TypeError('请传入 Promise 类型');
+    }
+    if (runConfig?.retry) {
+      setRetry(() => () => run(runConfig.retry(), runConfig));
     }
     setState({ ...state, stat: 'loading' });
     return promise
@@ -40,6 +44,8 @@ export function useAsync<D>(initialState?: State<D>, initialConfig?: typeof defa
     run,
     setData,
     setError,
+    // 重试/重新执行操作
+    retry,
     ...state,
   };
 }

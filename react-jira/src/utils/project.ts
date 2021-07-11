@@ -8,9 +8,30 @@ export function useProjects(param?: Partial<Project>) {
   const client = useHttp();
   const { run, ...result } = useAsync<Project[]>();
 
+  const fetchProject = () => client('projects', { data: cleanObject(param || {}) });
   useEffect(() => {
-    run(client('projects', { data: cleanObject(param || {}) }));
+    run(fetchProject(), { retry: fetchProject });
   }, [param]);
 
   return result;
+}
+
+export function useEditProject() {
+  const client = useHttp();
+  const { run, ...result } = useAsync<Project[]>();
+  const mutate = (params: Partial<Project>) => {
+    const { id, ...restParams } = params;
+    return run(client(`projects/${id}`, { data: restParams, method: 'PATCH' }));
+  };
+
+  return { mutate, ...result };
+}
+
+export function useAddProject() {
+  const client = useHttp();
+  const { run, ...result } = useAsync<Project[]>();
+  const mutate = (params: Partial<Project>) => {
+    run(client(`projects`, { data: params, method: 'POST' }));
+  };
+  return { mutate, ...result };
 }

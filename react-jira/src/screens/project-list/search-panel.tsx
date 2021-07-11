@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { Form, Input, Select } from 'antd';
+import { Form, Input } from 'antd';
 import { UserSelect } from 'components/user-select';
 import { Project } from './list';
 export interface User {
