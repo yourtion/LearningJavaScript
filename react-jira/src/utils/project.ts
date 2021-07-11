@@ -11,7 +11,7 @@ export function useProjects(param?: Partial<Project>) {
   const fetchProject = useCallback(() => client('projects', { data: cleanObject(param || {}) }), [param, client]);
   useEffect(() => {
     run(fetchProject(), { retry: fetchProject });
-  }, [param, fetchProject, run]);
+  }, [fetchProject, run]);
 
   return result;
 }

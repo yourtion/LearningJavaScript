@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Button, Dropdown, Menu } from 'antd';
-import { Row } from 'components/lib';
+import { ButtonNoPadding, Row } from 'components/lib';
 import { useAuth } from 'context/auth-context';
 import { ProjectListScreen } from './screens/project-list';
 import { ProjectScreen } from './screens/project';
@@ -8,25 +8,30 @@ import { ReactComponent as SoftwareLogo } from 'assets/software-logo.svg';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Navigate, Route, Routes } from 'react-router';
 import { resetRoute } from 'utils';
+import { useState } from 'react';
+import { ProjectModal } from 'screens/project-list/project-modal';
+import { ProjectPopover } from 'components/project-popover';
 
 export function AuthedApp() {
+  const [projectModalOpen, setProjectModalOpen] = useState(false);
   return (
     <Container>
-      <PageHeader />
+      <PageHeader setProjectModalOpen={setProjectModalOpen} />
       <Main>
         <Router>
           <Routes>
-            <Route path={'/projects'} element={<ProjectListScreen />} />
+            <Route path={'/projects'} element={<ProjectListScreen setProjectModalOpen={setProjectModalOpen} />} />
             <Route path={'/projects/:projectId/*'} element={<ProjectScreen />} />
             <Navigate to={window.location.pathname + '/projects'} />
           </Routes>
         </Router>
       </Main>
+      <ProjectModal projectModalOpen={projectModalOpen} onClose={() => setProjectModalOpen(false)} />
     </Container>
   );
 }
 
-const PageHeader = () => {
+const PageHeader = (props: { setProjectModalOpen: (isOpen: boolean) => void }) => {
   const { logout, user } = useAuth();
   const DropdownMenu = (
     <Menu>
@@ -40,11 +45,11 @@ const PageHeader = () => {
   return (
     <Header between={true}>
       <HeaderLeft gap={true}>
-        <Button type={'link'} onClick={resetRoute}>
+        <ButtonNoPadding style={{ padding: 0 }} type={'link'} onClick={resetRoute}>
           <SoftwareLogo width={'18rem'} color={'rgb(38, 132, 255)'} />
-        </Button>
-        <h2>项目</h2>
-        <h2>用户</h2>
+        </ButtonNoPadding>
+        <ProjectPopover setProjectModalOpen={props.setProjectModalOpen} />
+        <span>用户</span>
       </HeaderLeft>
       <HeaderRight>
         <Dropdown overlay={DropdownMenu}>
