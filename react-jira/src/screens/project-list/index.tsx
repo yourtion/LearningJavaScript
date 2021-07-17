@@ -7,11 +7,14 @@ import { useProjects } from 'utils/project';
 import { useUsers } from 'utils/user';
 import { useProjectSearchParams } from './util';
 import { Row } from 'components/lib';
+import { useDispatch } from 'react-redux';
+import { projectListActions } from './project-list.slice';
 
-export const ProjectListScreen = (props: { setProjectModalOpen: (isOpen: boolean) => void }) => {
+export const ProjectListScreen = () => {
   const [param, setParam] = useProjectSearchParams();
   const { isLoaing, error, data: list, retry } = useProjects(useDebounce(param, 500));
   const { data: users } = useUsers();
+  const dispatch = useDispatch();
 
   useDocumentTitle('项目列表');
 
@@ -19,17 +22,11 @@ export const ProjectListScreen = (props: { setProjectModalOpen: (isOpen: boolean
     <Container>
       <Row between={true}>
         <h1>项目列表</h1>
-        <Button onClick={() => props.setProjectModalOpen(true)}>创建项目</Button>
+        <Button onClick={() => dispatch(projectListActions.openProjectModal())}>创建项目</Button>
       </Row>
       <SearchPanel users={users || []} param={param} setParam={setParam} />
       {error ? <Typography.Text type={'danger'}>{error.message}</Typography.Text> : null}
-      <List
-        loading={isLoaing}
-        refresh={retry}
-        setProjectModalOpen={props.setProjectModalOpen}
-        users={users || []}
-        dataSource={list || []}
-      />
+      <List loading={isLoaing} refresh={retry} users={users || []} dataSource={list || []} />
     </Container>
   );
 };
