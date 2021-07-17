@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
-import { Popover, Typography, List, Divider, Button } from 'antd';
+import { Popover, Typography, List, Divider } from 'antd';
 import { useProjects } from 'utils/project';
 import { ButtonNoPadding } from './lib';
 
 export const ProjectPopover = (props: { setProjectModalOpen: (isOpen: boolean) => void }) => {
-  const { data: projects, isLoaing } = useProjects();
+  const { data: projects } = useProjects();
   const pinedProjects = projects?.filter((p) => p.pin);
   const content = (
     <ContentContainer>
