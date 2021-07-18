@@ -32,7 +32,7 @@ const AuthContext = React.createContext<
 AuthContext.displayName = 'AuthContext';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { run, isLoaing, isIdle, isError, error, data: user, setData: setUser } = useAsync<User | null>();
+  const { run, isLoading: isLoaing, isIdle, isError, error, data: user, setData: setUser } = useAsync<User | null>();
 
   const login = (form: AuthForm) => auth.login(form).then(setUser);
   const register = (form: AuthForm) => auth.register(form).then(setUser);

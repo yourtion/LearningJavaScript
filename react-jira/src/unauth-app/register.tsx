@@ -5,7 +5,7 @@ import { useAsync } from 'utils/use-async';
 
 export const RegisterScreen = ({ onError }: { onError: (e: Error) => void }) => {
   const { register } = useAuth();
-  const { isLoaing, run } = useAsync(undefined, { throwOnError: true });
+  const { isLoading: isLoaing, run } = useAsync(undefined, { throwOnError: true });
   const handleSubmit = ({ cpassword, ...values }: { username: string; password: string; cpassword: string }) => {
     if (cpassword !== values.password) {
       return onError(new Error('请确认两次输入的密码相同'));

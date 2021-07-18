@@ -10,7 +10,8 @@ export function isVoid(val: unknown) {
 /**
  * 清理对象中的空值
  */
-export function cleanObject(obj: Record<string, unknown>) {
+export function cleanObject(obj?: Record<string, unknown>) {
+  if (!obj) return {};
   const result = { ...obj };
   Object.keys(obj).forEach((k) => {
     if (isVoid(obj[k])) {

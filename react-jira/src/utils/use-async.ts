@@ -49,7 +49,7 @@ export function useAsync<D>(initialState?: State<D>, initialConfig?: typeof defa
   );
   return {
     isIdle: state.stat === 'idle',
-    isLoaing: state.stat === 'loading',
+    isLoading: state.stat === 'loading',
     isError: state.stat === 'error',
     isSuccess: state.stat === 'success',
     run,
