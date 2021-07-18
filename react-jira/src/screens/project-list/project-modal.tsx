@@ -5,18 +5,18 @@ import { ErrorBox } from 'components/lib';
 import { UserSelect } from 'components/user-select';
 import { useEffect } from 'react';
 import { useAddProject, useEditProject } from 'utils/project';
-import { useProjectModal } from './util';
+import { useProjectModal, useProjectQueryKey } from './util';
 
 export const ProjectModal = () => {
   const { projectModalOpen, closeProjectModal, isLoading, editingProject } = useProjectModal();
   const useMutateProject = editingProject ? useEditProject : useAddProject;
 
-  const { mutateAsync, error, isLoading: mutateLoading } = useMutateProject();
+  const { mutateAsync, error, isLoading: mutateLoading } = useMutateProject(useProjectQueryKey());
   const [form] = useForm();
   const onFinish = (values: any) => {
+    closeProjectModal();
     mutateAsync({ ...editingProject, ...values }).then(() => {
       form.resetFields();
-      closeProjectModal();
     });
   };
   const onClose = () => {

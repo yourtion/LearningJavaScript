@@ -1,10 +1,18 @@
 import { useMemo } from 'react';
-import { useProject } from 'utils/project';
+import { cleanObject } from 'utils';
+import { KEY_PROJECTS, useProject } from 'utils/project';
 import { useUrlQueryParam } from 'utils/url';
 
 export function useProjectSearchParams() {
   const [param, setParam] = useUrlQueryParam(['name', 'personId']);
-  return [useMemo(() => ({ ...param, personId: Number(param.personId) || undefined }), [param]), setParam] as const;
+  return [
+    useMemo(() => cleanObject({ ...param, personId: Number(param.personId) || undefined }), [param]),
+    setParam,
+  ] as const;
+}
+
+export function useProjectQueryKey() {
+  return [KEY_PROJECTS, useProjectSearchParams()[0]];
 }
 
 export function useProjectModal() {
