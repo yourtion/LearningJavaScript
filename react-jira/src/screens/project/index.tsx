@@ -12,7 +12,7 @@ export const ProjectScreen = () => {
       <Routes>
         <Route path={'/board'} element={<BoardScreen />} />
         <Route path={'/epic'} element={<EpicScreen />} />
-        <Navigate to={window.location.pathname + '/board'} />
+        <Navigate to={window.location.pathname + '/board'} replace={true} />
       </Routes>
     </div>
   );
