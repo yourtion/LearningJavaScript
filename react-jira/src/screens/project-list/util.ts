@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { cleanObject } from 'utils';
 import { KEY_PROJECTS, useProject } from 'utils/project';
-import { useUrlQueryParam } from 'utils/url';
+import { useSetUrlSearchParam, useUrlQueryParam } from 'utils/url';
 
 export function useProjectSearchParams() {
   const [param, setParam] = useUrlQueryParam(['name', 'personId']);
@@ -16,16 +16,15 @@ export function useProjectQueryKey() {
 }
 
 export function useProjectModal() {
-  const [{ projcetCreate, editingProjectId }, setProjectModal] = useUrlQueryParam([
-    'projcetCreate',
-    'editingProjectId',
-  ]);
+  const [{ projcetCreate, editingProjectId }] = useUrlQueryParam(['projcetCreate', 'editingProjectId']);
+
+  const setSearchParams = useSetUrlSearchParam();
 
   const { data: editingProject, isLoading } = useProject(Number(editingProjectId));
 
-  const openProjectModal = () => setProjectModal({ projcetCreate: true, editingProjectId: undefined });
-  const closeProjectModal = () => setProjectModal({ projcetCreate: undefined, editingProjectId: undefined });
-  const startEdit = (id: number) => setProjectModal({ editingProjectId: id });
+  const openProjectModal = () => setSearchParams({ projcetCreate: true, editingProjectId: undefined });
+  const closeProjectModal = () => setSearchParams({ projcetCreate: undefined, editingProjectId: undefined });
+  const startEdit = (id: number) => setSearchParams({ editingProjectId: id });
 
   return {
     projectModalOpen: projcetCreate === 'true' || Boolean(editingProjectId),
