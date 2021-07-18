@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Button, Drawer, Spin, Form, Input } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { ErrorBox } from 'components/lib';
-import { UserSelect } from 'components/user-select';
+import { UserSelect } from 'components/select-user';
 import { useEffect } from 'react';
 import { useAddProject, useEditProject } from 'utils/project';
 import { useProjectModal, useProjectQueryKey } from './util';

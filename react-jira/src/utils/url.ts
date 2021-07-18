@@ -12,9 +12,9 @@ export function useUrlQueryParam<K extends string>(keys: K[]) {
   ] as const;
 }
 
-export function useSetUrlSearchParam() {
+export function useSetUrlSearchParam<T = Record<string, unknown>>() {
   const [searchParams, setSearchParam] = useSearchParams();
-  return (params: Record<string, unknown>) => {
+  return (params: Partial<T>) => {
     const o = cleanObject({ ...Object.fromEntries(searchParams), ...params });
     return setSearchParam(o as URLSearchParamsInit);
   };
