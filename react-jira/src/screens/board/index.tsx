@@ -7,6 +7,7 @@ import { useTasks } from 'utils/task';
 import { BoardColumn } from './board-column';
 import { CreateBoard } from './create-board';
 import { SearchPanel } from './search-panel';
+import { TaskModal } from './task-modal';
 import { useBoardSearchParams, useProjectInUrl, useTasksSearchParams } from './util';
 
 export const BoardScreen = () => {
@@ -29,6 +30,7 @@ export const BoardScreen = () => {
           <CreateBoard />
         </ColumnsContainer>
       )}
+      <TaskModal />
     </ScreenContainer>
   );
 };

@@ -1,12 +1,15 @@
-import { Board } from 'types';
+import { Board, Task } from 'types';
 import { useTasks } from 'utils/task';
 import { useTaskTypes } from 'utils/task-type';
-import { useTasksSearchParams } from './util';
+import { useBoardQueryKey, useTasksModal, useTasksSearchParams } from './util';
 import taskIcon from 'assets/task.svg';
 import bugIcon from 'assets/bug.svg';
 import styled from '@emotion/styled';
-import { Card } from 'antd';
+import { Button, Card, Dropdown, Menu, Modal } from 'antd';
 import { CreateTask } from './create-task';
+import { Mark } from 'components/mark';
+import { useDeleteBoard } from 'utils/board';
+import { Row } from 'components/lib';
 
 const TASK_ICON_MAP = {
   task: taskIcon,
@@ -17,26 +20,66 @@ const TaskTypeIcon = ({ id }: { id: number }) => {
   const { data: taskTypes } = useTaskTypes();
   const name = taskTypes?.find((taskType) => taskType.id === id)?.name;
   if (!name) return null;
-  return <img src={TASK_ICON_MAP[name]} />;
+  return <img src={TASK_ICON_MAP[name]} alt={name} />;
+};
+
+const TaskCard = ({ task }: { task: Task }) => {
+  const { startEdit } = useTasksModal();
+  const { name: keyword } = useTasksSearchParams();
+
+  return (
+    <Card onClick={() => startEdit(task.id)} style={{ marginBottom: '0.5rem', cursor: 'pointer' }} key={task.id}>
+      <p>
+        <Mark name={task.name} keyword={keyword} />
+      </p>
+      <TaskTypeIcon id={task.typeId} />
+    </Card>
+  );
 };
 
 export const BoardColumn = ({ board }: { board: Board }) => {
-  const param = useTasksSearchParams();
-  const { data: allTasks } = useTasks(param);
+  const { data: allTasks } = useTasks(useTasksSearchParams());
   const tasks = allTasks?.filter((task) => task.kanbanId === board.id);
+
   return (
     <Container>
-      <h3> {board.name}</h3>
+      <Row between={true}>
+        <h3> {board.name}</h3>
+        <More board={board} />
+      </Row>
       <TaskContainer>
         {tasks?.map((task) => (
-          <Card style={{ marginBottom: '0.5rem' }} key={task.id}>
-            <div>{task.name} </div>
-            <TaskTypeIcon id={task.typeId} />
-          </Card>
+          <TaskCard task={task} key={task.id} />
         ))}
         <CreateTask boardId={board.id} />
       </TaskContainer>
     </Container>
+  );
+};
+
+const More = ({ board }: { board: Board }) => {
+  const { mutateAsync } = useDeleteBoard(useBoardQueryKey());
+  const startEdit = () => {
+    Modal.confirm({
+      okText: '确定',
+      cancelText: '取消',
+      title: `确定删除${board.name}么？`,
+      onOk() {
+        return mutateAsync({ id: board.id });
+      },
+    });
+  };
+  const overlay = (
+    <Menu>
+      <Button type={'link'} onClick={startEdit}>
+        删除
+      </Button>
+    </Menu>
+  );
+  return (
+    <Dropdown overlay={overlay}>
+      <Button type={'link'}>...</Button>
+    </Dropdown>
   );
 };
 

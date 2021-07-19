@@ -2,7 +2,7 @@ import { QueryKey, useMutation, useQuery } from 'react-query';
 import { Board } from 'types';
 import { cleanObject } from 'utils';
 import { useHttp } from './http';
-import { useAddConfig } from './use-optimistic-options';
+import { useAddConfig, useDeleteConfig } from './use-optimistic-options';
 
 export const KEY_BOARDS = 'boards';
 
@@ -21,5 +21,16 @@ export function useAddBoard(queryKey: QueryKey) {
         data: params,
       }),
     useAddConfig(queryKey)
+  );
+}
+
+export function useDeleteBoard(queryKey: QueryKey) {
+  const client = useHttp();
+  return useMutation(
+    ({ id }: { id: number }) =>
+      client(`kanbans/${id}`, {
+        method: 'DELETE',
+      }),
+    useDeleteConfig(queryKey)
   );
 }
