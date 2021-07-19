@@ -6,6 +6,7 @@ import taskIcon from 'assets/task.svg';
 import bugIcon from 'assets/bug.svg';
 import styled from '@emotion/styled';
 import { Card } from 'antd';
+import { CreateTask } from './create-task';
 
 const TASK_ICON_MAP = {
   task: taskIcon,
@@ -33,12 +34,13 @@ export const BoardColumn = ({ board }: { board: Board }) => {
             <TaskTypeIcon id={task.typeId} />
           </Card>
         ))}
+        <CreateTask boardId={board.id} />
       </TaskContainer>
     </Container>
   );
 };
 
-const Container = styled.div`
+export const Container = styled.div`
   min-width: 27rem;
   border-radius: 6px;
   background-color: rgb(244, 245, 247);
