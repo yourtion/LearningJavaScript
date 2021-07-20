@@ -1,3 +1,4 @@
+import React from 'react';
 import { Board, Task } from 'types';
 import { useTasks } from 'utils/task';
 import { useTaskTypes } from 'utils/task-type';
@@ -10,6 +11,7 @@ import { CreateTask } from './create-task';
 import { Mark } from 'components/mark';
 import { useDeleteBoard } from 'utils/board';
 import { Row } from 'components/lib';
+import { Drag, Drop, DropChild } from 'components/drag-and-drop';
 
 const TASK_ICON_MAP = {
   task: taskIcon,
@@ -37,25 +39,33 @@ const TaskCard = ({ task }: { task: Task }) => {
   );
 };
 
-export const BoardColumn = ({ board }: { board: Board }) => {
+export const BoardColumn = React.forwardRef<HTMLDivElement, { board: Board }>(({ board, ...props }, ref) => {
   const { data: allTasks } = useTasks(useTasksSearchParams());
   const tasks = allTasks?.filter((task) => task.kanbanId === board.id);
 
   return (
-    <Container>
+    <Container {...props} ref={ref}>
       <Row between={true}>
         <h3> {board.name}</h3>
-        <More board={board} />
+        <More board={board} key={board.id} />
       </Row>
       <TaskContainer>
-        {tasks?.map((task) => (
-          <TaskCard task={task} key={task.id} />
-        ))}
-        <CreateTask boardId={board.id} />
+        <Drop type={'ROW'} direction={'vertical'} droppableId={'task:' + board.id}>
+          <DropChild>
+            {tasks?.map((task, index) => (
+              <Drag key={task.id} index={index} draggableId={'task-' + task.id}>
+                <div>
+                  <TaskCard task={task} key={task.id} />
+                </div>
+              </Drag>
+            ))}
+            <CreateTask boardId={board.id} />
+          </DropChild>
+        </Drop>
       </TaskContainer>
     </Container>
   );
-};
+});
 
 const More = ({ board }: { board: Board }) => {
   const { mutateAsync } = useDeleteBoard(useBoardQueryKey());

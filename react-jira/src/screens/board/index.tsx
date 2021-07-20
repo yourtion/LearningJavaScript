@@ -1,6 +1,8 @@
 import styled from '@emotion/styled';
 import { Spin } from 'antd';
+import { Drag, Drop, DropChild } from 'components/drag-and-drop';
 import { ScreenContainer } from 'components/lib';
+import { DragDropContext } from 'react-beautiful-dnd';
 import { useDocumentTitle } from 'utils';
 import { useBoards } from 'utils/board';
 import { useTasks } from 'utils/task';
@@ -17,21 +19,29 @@ export const BoardScreen = () => {
   const { isLoading: taskIsLoading } = useTasks(useTasksSearchParams());
   const isLoading = taskIsLoading || boardIsLoading;
   return (
-    <ScreenContainer>
-      <h1>{currectProject?.name}看板</h1>
-      <SearchPanel />
-      {isLoading ? (
-        <Spin size={'large'} />
-      ) : (
-        <ColumnsContainer>
-          {boards?.map((board) => (
-            <BoardColumn board={board} key={board.id} />
-          ))}
-          <CreateBoard />
-        </ColumnsContainer>
-      )}
-      <TaskModal />
-    </ScreenContainer>
+    <DragDropContext onDragEnd={() => {}}>
+      <ScreenContainer>
+        <h1>{currectProject?.name}看板</h1>
+        <SearchPanel />
+        {isLoading ? (
+          <Spin size={'large'} />
+        ) : (
+          <ColumnsContainer>
+            <Drop type={'COLUMN'} direction={'horizontal'} droppableId={'board'}>
+              <DropChild style={{ display: 'flex' }}>
+                {boards?.map((board, index) => (
+                  <Drag key={board.id} draggableId={'board-' + board.id} index={index}>
+                    <BoardColumn board={board} key={board.id} />
+                  </Drag>
+                ))}
+                <CreateBoard />
+              </DropChild>
+            </Drop>
+          </ColumnsContainer>
+        )}
+        <TaskModal />
+      </ScreenContainer>
+    </DragDropContext>
   );
 };
 
