@@ -35,3 +35,5 @@ export const useAddConfig = (queyKey: QueryKey) =>
     }
     return [...old, newTarget];
   });
+
+export const useReorderConfig = (queyKey: QueryKey) => useConfig(queyKey, (target, old) => old);

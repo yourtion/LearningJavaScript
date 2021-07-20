@@ -50,8 +50,8 @@ export const BoardColumn = React.forwardRef<HTMLDivElement, { board: Board }>(({
         <More board={board} key={board.id} />
       </Row>
       <TaskContainer>
-        <Drop type={'ROW'} direction={'vertical'} droppableId={'task:' + board.id}>
-          <DropChild>
+        <Drop type={'ROW'} direction={'vertical'} droppableId={String(board.id)}>
+          <DropChild style={{ minHeight: '5px' }}>
             {tasks?.map((task, index) => (
               <Drag key={task.id} index={index} draggableId={'task-' + task.id}>
                 <div>
@@ -59,9 +59,9 @@ export const BoardColumn = React.forwardRef<HTMLDivElement, { board: Board }>(({
                 </div>
               </Drag>
             ))}
-            <CreateTask boardId={board.id} />
           </DropChild>
         </Drop>
+        <CreateTask boardId={board.id} />
       </TaskContainer>
     </Container>
   );
