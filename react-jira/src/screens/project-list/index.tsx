@@ -7,6 +7,7 @@ import { useProjects } from 'utils/project';
 import { useUsers } from 'utils/user';
 import { useProjectSearchParams } from './util';
 import { Row } from 'components/lib';
+import { Profiler } from 'components/profiler';
 
 export const ProjectListScreen = (props: { setProjectModalOpen: (isOpen: boolean) => void }) => {
   const [param, setParam] = useProjectSearchParams();
@@ -16,21 +17,23 @@ export const ProjectListScreen = (props: { setProjectModalOpen: (isOpen: boolean
   useDocumentTitle('项目列表');
 
   return (
-    <Container>
-      <Row between={true}>
-        <h1>项目列表</h1>
-        <Button onClick={() => props.setProjectModalOpen(true)}>创建项目</Button>
-      </Row>
-      <SearchPanel users={users || []} param={param} setParam={setParam} />
-      {error ? <Typography.Text type={'danger'}>{error.message}</Typography.Text> : null}
-      <List
-        loading={isLoaing}
-        refresh={retry}
-        setProjectModalOpen={props.setProjectModalOpen}
-        users={users || []}
-        dataSource={list || []}
-      />
-    </Container>
+    <Profiler id={'项目列表'}>
+      <Container>
+        <Row between={true}>
+          <h1>项目列表</h1>
+          <Button onClick={() => props.setProjectModalOpen(true)}>创建项目</Button>
+        </Row>
+        <SearchPanel users={users || []} param={param} setParam={setParam} />
+        {error ? <Typography.Text type={'danger'}>{error.message}</Typography.Text> : null}
+        <List
+          loading={isLoaing}
+          refresh={retry}
+          setProjectModalOpen={props.setProjectModalOpen}
+          users={users || []}
+          dataSource={list || []}
+        />
+      </Container>
+    </Profiler>
   );
 };
 

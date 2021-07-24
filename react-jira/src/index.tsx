@@ -7,14 +7,17 @@ import reportWebVitals from './reportWebVitals';
 import { loadServer, DevTools } from 'jira-dev-tool';
 // 必须在 jira-dev-tool 后引入
 import 'antd/dist/antd.less';
+import { Profiler } from 'components/profiler';
 
 loadServer(() =>
   ReactDOM.render(
     <React.StrictMode>
-      <AppProviders>
-        <DevTools />
-        <App />
-      </AppProviders>
+      <Profiler id={'RootApp'} phases={['mount']}>
+        <AppProviders>
+          <DevTools />
+          <App />
+        </AppProviders>
+      </Profiler>
     </React.StrictMode>,
     document.getElementById('root')
   )

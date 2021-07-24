@@ -12,7 +12,7 @@ function App() {
   return (
     <div className="App">
       <ErrorBoundary fallbackRender={FullPageErrorFallback}>
-        <React.Suspense fallback={FullPageLoading}>{user ? <AuthedApp /> : <UnauthApp />}</React.Suspense>
+        <React.Suspense fallback={<FullPageLoading />}>{user ? <AuthedApp /> : <UnauthApp />}</React.Suspense>
       </ErrorBoundary>
     </div>
   );
