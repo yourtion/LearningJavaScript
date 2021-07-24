@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { ProjectModal } from 'screens/project-list/project-modal';
 import { ProjectPopover } from 'components/project-popover';
 
-export function AuthedApp() {
+export default function AuthedApp() {
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   return (
     <Container>

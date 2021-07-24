@@ -8,7 +8,7 @@ import left from 'assets/left.svg';
 import right from 'assets/right.svg';
 import { useDocumentTitle } from 'utils';
 
-export function UnauthApp() {
+export default function UnauthApp() {
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const switchRegister = () => {
