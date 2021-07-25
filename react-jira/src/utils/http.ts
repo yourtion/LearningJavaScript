@@ -3,7 +3,7 @@ import * as auth from 'auth-provider';
 import { useAuth } from 'context/auth-context';
 import { useCallback } from 'react';
 
-const apiUrl = process.env.REACT_APP_API_URL;
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
 interface Config extends RequestInit {
   token?: string;
@@ -36,10 +36,10 @@ export function http(endpoint: string, { data, token, headers, ...customConfig }
   });
 }
 
-export function useHttp() {
+export const useHttp = () => {
   const { user } = useAuth();
   return useCallback(
     (...[enpoint, config]: Parameters<typeof http>) => http(enpoint, { ...config, token: user?.token }),
     [user?.token]
   );
-}
+};

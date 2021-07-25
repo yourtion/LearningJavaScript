@@ -58,11 +58,13 @@
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
+    "@testing-library/react-hooks": "^7.0.1",
     "@types/qs": "^6.9.6",
     "@welldone-software/why-did-you-render": "^6.2.0",
     "eslint-config-prettier": "^8.3.0",
     "husky": ">=6",
     "lint-staged": ">=10",
+    "msw": "^0.33.0",
     "prettier": "2.3.2"
   },
   "husky": {
