@@ -9,7 +9,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { Navigate, Route, Routes } from 'react-router';
 import { resetRoute } from 'utils';
 import { ProjectModal } from 'screens/project-list/project-modal';
-import { ProjectPopover } from 'components/project-popover';
+import { ProjectPopover } from 'components/popover-project';
+import { UserPopover } from 'components/popover-user';
 
 export function AuthedApp() {
   return (
@@ -47,7 +48,7 @@ const PageHeader = () => {
           <SoftwareLogo width={'18rem'} color={'rgb(38, 132, 255)'} />
         </ButtonNoPadding>
         <ProjectPopover />
-        <span>用户</span>
+        <UserPopover />
       </HeaderLeft>
       <HeaderRight>
         <Dropdown overlay={DropdownMenu}>
