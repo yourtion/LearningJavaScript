@@ -5,3 +5,4 @@ export * from './project';
 export * from './board';
 export * from './task';
 export * from './task-type';
+export * from './epic';

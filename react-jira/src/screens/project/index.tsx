@@ -50,4 +50,5 @@ const Container = styled.div`
   display: grid;
   grid-template-columns: 16rem 1fr;
   overflow: hidden;
+  width: 100%;
 `;
