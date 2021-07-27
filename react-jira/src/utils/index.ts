@@ -10,7 +10,8 @@ export function isVoid(val: unknown) {
 /**
  * 清理对象中的空值
  */
-export function cleanObject(obj: Record<string, unknown>) {
+export function cleanObject(obj?: Record<string, unknown>) {
+  if (!obj) return {};
   const result = { ...obj };
   Object.keys(obj).forEach((k) => {
     if (isVoid(obj[k])) {
@@ -81,4 +82,12 @@ export function useMountedRef() {
     };
   });
   return mountedRef;
+}
+
+/**
+ * 传入一个对象，和键集合，返回对应的对象中的键值对
+ */
+export function subset<O extends { [key in string]: unknown }, K extends keyof O>(obj: O, keys: K[]) {
+  const filteredEntries = Object.entries(obj).filter(([key]) => keys.includes(key as K));
+  return Object.fromEntries(filteredEntries) as Pick<O, K>;
 }

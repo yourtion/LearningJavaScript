@@ -1,28 +1,18 @@
-import { User } from './search-panel';
-import { Dropdown, Menu, Table, TableProps } from 'antd';
+import { User, Project } from 'types';
+import { Dropdown, Menu, Table, TableProps, Modal } from 'antd';
 import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
 import { Pin } from 'components/pin';
-import { useEditProject } from 'utils/project';
+import { useDeleteProject, useEditProject } from 'utils/project';
 import { ButtonNoPadding } from 'components/lib';
-export interface Project {
-  id: number;
-  name: string;
-  personId: number;
-  organization: string;
-  created: number;
-  pin: boolean;
-}
-
+import { useProjectModal, useProjectQueryKey } from './util';
 interface ListProps extends TableProps<Project> {
   users: User[];
-  refresh?: () => void;
-  setProjectModalOpen: (isOpen: boolean) => void;
 }
 
 export const List = ({ users, ...props }: ListProps) => {
-  const { mutate } = useEditProject();
-  const pinProject = (id: number) => (pin: boolean) => mutate({ id, pin }).then(props.refresh);
+  const { mutate } = useEditProject(useProjectQueryKey());
+  const pinProject = (id: number) => (pin: boolean) => mutate({ id, pin });
   return (
     <Table
       pagination={false}
@@ -59,25 +49,47 @@ export const List = ({ users, ...props }: ListProps) => {
         },
         {
           render(value, project) {
-            return (
-              <Dropdown
-                overlay={
-                  <Menu>
-                    <Menu.Item key={'edit'}>
-                      <ButtonNoPadding type={'link'} onClick={() => props.setProjectModalOpen(true)}>
-                        编辑
-                      </ButtonNoPadding>
-                    </Menu.Item>
-                  </Menu>
-                }
-              >
-                <ButtonNoPadding type={'link'}>...</ButtonNoPadding>
-              </Dropdown>
-            );
+            return <More project={project} />;
           },
         },
       ]}
       {...props}
     />
+  );
+};
+
+const More = ({ project }: { project: Project }) => {
+  const { startEdit } = useProjectModal();
+  const editProject = (id: number) => () => startEdit(id);
+  const { mutate: deleteProject } = useDeleteProject(useProjectQueryKey());
+  const confirmDeleteProject = (project: Project) => {
+    Modal.confirm({
+      title: `确定删除 ${project.name} 吗？`,
+      content: '点击确定删除',
+      okText: '确定',
+      onOk() {
+        deleteProject(project);
+      },
+    });
+  };
+  return (
+    <Dropdown
+      overlay={
+        <Menu>
+          <Menu.Item key={'edit'}>
+            <ButtonNoPadding type={'link'} onClick={editProject(project.id)}>
+              编辑
+            </ButtonNoPadding>
+          </Menu.Item>
+          <Menu.Item key={'delete'}>
+            <ButtonNoPadding type={'link'} onClick={() => confirmDeleteProject(project)}>
+              删除
+            </ButtonNoPadding>
+          </Menu.Item>
+        </Menu>
+      }
+    >
+      <ButtonNoPadding type={'link'}>...</ButtonNoPadding>
+    </Dropdown>
   );
 };

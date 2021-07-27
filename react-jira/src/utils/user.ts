@@ -1,18 +1,10 @@
-import { useCallback } from 'react';
-import { User } from 'screens/project-list/search-panel';
-import { useMount } from 'utils';
+import { useQuery } from 'react-query';
+import { User } from 'types';
 import { useHttp } from './http';
-import { useAsync } from './use-async';
+
+export const KEY_USERS = 'users';
 
 export function useUsers(param?: Partial<User>) {
   const client = useHttp();
-  const { run, ...result } = useAsync<User[]>();
-
-  useMount(
-    useCallback(() => {
-      run(client('users'));
-    }, [run, client])
-  );
-
-  return result;
+  return useQuery<User[]>([KEY_USERS, param], () => client('users', { data: param }));
 }

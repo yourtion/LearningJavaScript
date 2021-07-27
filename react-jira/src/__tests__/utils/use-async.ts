@@ -9,7 +9,7 @@ const defaultState: ReturnType<typeof useAsync> = {
 
   isIdle: true,
   isError: false,
-  isLoaing: false,
+  isLoading: false,
   isSuccess: false,
 
   run: expect.any(Function),
@@ -18,7 +18,7 @@ const defaultState: ReturnType<typeof useAsync> = {
   retry: expect.any(Function),
 };
 
-const loadingState: ReturnType<typeof useAsync> = { ...defaultState, stat: 'loading', isLoaing: true, isIdle: false };
+const loadingState: ReturnType<typeof useAsync> = { ...defaultState, stat: 'loading', isLoading: true, isIdle: false };
 const successState: ReturnType<typeof useAsync> = { ...defaultState, stat: 'success', isSuccess: true, isIdle: false };
 
 test('useAsync', async () => {

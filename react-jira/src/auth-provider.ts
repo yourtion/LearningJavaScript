@@ -1,4 +1,4 @@
-import { User } from 'screens/project-list/search-panel';
+import { User } from 'types';
 import { http } from 'utils/http';
 
 const localStorageKey = '__auth_provider_token__';

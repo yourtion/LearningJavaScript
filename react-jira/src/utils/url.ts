@@ -1,19 +1,21 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { URLSearchParamsInit, useSearchParams } from 'react-router-dom';
-import { cleanObject } from 'utils';
+import { cleanObject, subset } from 'utils';
 
 export function useUrlQueryParam<K extends string>(keys: K[]) {
-  const [searchParams, setSearchParam] = useSearchParams();
-  const params = keys.reduce((prev, key) => {
-    return { ...prev, [key]: searchParams.get(key) || '' };
-  }, {} as Record<K, string>);
+  const [searchParams] = useSearchParams();
+  const setSearchParams = useSetUrlSearchParam();
+  const [stateKeys] = useState(keys);
   return [
-    // 不关心 keys 是否变化，所以不加入依赖检查
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useMemo(() => params, [searchParams]),
-    (params: Partial<{ [key in K]: unknown }>) => {
-      const o = cleanObject({ ...Object.fromEntries(searchParams), ...params });
-      return setSearchParam(o as URLSearchParamsInit);
-    },
+    useMemo(() => subset(Object.fromEntries(searchParams), stateKeys) as Record<K, string>, [searchParams, stateKeys]),
+    (params: Partial<{ [key in K]: unknown }>) => setSearchParams(params),
   ] as const;
+}
+
+export function useSetUrlSearchParam<T = Record<string, unknown>>() {
+  const [searchParams, setSearchParam] = useSearchParams();
+  return (params: Partial<T>) => {
+    const o = cleanObject({ ...Object.fromEntries(searchParams), ...params });
+    return setSearchParam(o as URLSearchParamsInit);
+  };
 }
